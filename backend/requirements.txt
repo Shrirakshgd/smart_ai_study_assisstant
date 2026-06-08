@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+langchain
+langchain-google-genai
+langchain-community
+langchain-chroma
+chromadb
+pypdf
+python-multipart
+python-dotenv
+SQLAlchemy
+passlib[bcrypt]
+python-jose
