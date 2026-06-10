@@ -43,6 +43,7 @@ For Windows users, there is an automated startup script that handles installing 
    ```bash
    python -m venv venv
    source venv/Scripts/activate  # On Windows
+   or source venv/bin/activate
    ```
 3. Install dependencies:
    ```bash
