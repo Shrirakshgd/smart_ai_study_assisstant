@@ -1,5 +1,0 @@
-Artificial Intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think and learn like humans. The ideal characteristic of artificial intelligence is its ability to rationalize and take actions that have the best chance of achieving a specific goal. 
-
-Machine Learning (ML) is a subset of AI that focuses on building systems that learn from data. NLP (Natural Language Processing) is another subset that gives computers the ability to understand text and spoken words in much the same way human beings can.
-
-Key organizations working on AI include Google, OpenAI, Microsoft, and Meta.

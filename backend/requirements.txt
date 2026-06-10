@@ -11,3 +11,6 @@ python-dotenv
 SQLAlchemy
 passlib[bcrypt]
 python-jose
+spacy
+scikit-learn
+email-validator

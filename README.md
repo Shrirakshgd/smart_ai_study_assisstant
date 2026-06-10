@@ -29,6 +29,14 @@ This project is built using a modern decoupled architecture:
 - Python 3.10+
 - Google Cloud / MakerSuite API Key (for Google GenAI)
 
+### Quick Start (Windows)
+For Windows users, there is an automated startup script that handles installing dependencies and starting both the backend and frontend servers:
+1. Ensure your `backend\.env` file is created and contains your `GOOGLE_API_KEY` and `JWT_SECRET_KEY` (see Backend Setup below).
+2. Simply double-click `setup_and_run.bat` in the root folder, or run it from your terminal:
+   ```cmd
+   .\setup_and_run.bat
+   ```
+
 ### Backend Setup
 1. Navigate to the `backend` directory.
 2. Create a virtual environment:
@@ -40,10 +48,13 @@ This project is built using a modern decoupled architecture:
    ```bash
    pip install -r requirements.txt
    ```
-4. Create a `.env` file in the `backend` folder and add your environment variables:
+4. Create a `.env` file in the `backend` folder and add your environment variables.
+   > **Note:** You can generate a secure `JWT_SECRET_KEY` by running the following command in your terminal:
+   > `python -c "import secrets; print(secrets.token_hex(32))"`
+
    ```env
    GOOGLE_API_KEY=your_google_api_key_here
-   SECRET_KEY=your_jwt_secret_key
+   JWT_SECRET_KEY=your_generated_secret_key_here
    ```
 5. Run the FastAPI server:
    ```bash
