@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 import os
 import shutil
+import requests as http_requests
 from typing import List, Optional
 
 from services import process_document, ask_question, generate_summary, generate_quiz, load_note_context
@@ -65,6 +66,65 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+
+class GoogleAuthRequest(BaseModel):
+    access_token: str
+
+@app.post("/auth/google", response_model=schemas.GoogleToken)
+def google_auth(request: GoogleAuthRequest, db: Session = Depends(get_db)):
+    """Verify Google OAuth access token, then find-or-create user and return our JWT."""
+    # Verify token by calling Google's userinfo endpoint
+    resp = http_requests.get(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        headers={"Authorization": f"Bearer {request.access_token}"},
+        timeout=10,
+    )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid Google token")
+
+    userinfo = resp.json()
+    google_id = userinfo.get("sub")
+    email = userinfo.get("email")
+    name = userinfo.get("name", "")
+
+    if not google_id or not email:
+        raise HTTPException(status_code=401, detail="Could not retrieve Google account info")
+
+    # 1) Look up by google_id
+    user = db.query(models.User).filter(models.User.google_id == google_id).first()
+
+    if not user:
+        # 2) Try matching existing account by email → link it
+        user = db.query(models.User).filter(models.User.email == email).first()
+        if user:
+            user.google_id = google_id
+            db.commit()
+        else:
+            # 3) Brand-new user — auto-create
+            base_username = (name.replace(" ", "").lower() or email.split("@")[0])[:20]
+            username = base_username
+            counter = 1
+            while db.query(models.User).filter(models.User.username == username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user = models.User(
+                username=username,
+                email=email,
+                password_hash=None,
+                google_id=google_id,
+            )
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+
+    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth.create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer", "username": user.username}
 
 @app.get("/notes", response_model=List[schemas.NoteResponse])
 def get_notes(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):

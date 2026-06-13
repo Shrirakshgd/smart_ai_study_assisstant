@@ -11,6 +11,28 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <script>
+    // Disable right-click context menu
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    // Disable common developer tools keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      // Disable F12
+      if (e.key === 'F12') {
+        e.preventDefault();
+      }
+      // Disable Ctrl+Shift+I (Inspect element), Ctrl+Shift+J (Console), Ctrl+Shift+C (Inspect cursor)
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+        e.preventDefault();
+      }
+      // Disable Ctrl+U (View source)
+      if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 
 </html>
